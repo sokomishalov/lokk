@@ -4,8 +4,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.sokomishalov</groupId>
-    <artifactId>lokk</artifactId>
+    <groupId>ru.sokomishalov.lokk</groupId>
+    <artifactId>lokk-parent</artifactId>
     <version>0.0.1</version>
     <packaging>pom</packaging>
 
@@ -14,7 +14,6 @@
         <kotlin.version>1.3.61</kotlin.version>
         <kotlinx.version>1.3.3</kotlinx.version>
         <jackson.version>2.10.1</jackson.version>
-        <gson.version>2.8.6</gson.version>
         <logback.version>1.2.3</logback.version>
         <spring.version>5.2.2.RELEASE</spring.version>
         <lettuce.version>5.2.1.RELEASE</lettuce.version>
