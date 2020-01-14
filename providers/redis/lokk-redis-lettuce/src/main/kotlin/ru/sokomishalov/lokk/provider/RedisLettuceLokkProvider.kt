@@ -15,7 +15,9 @@
  */
 package ru.sokomishalov.lokk.provider
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.lettuce.core.RedisClient
 import io.lettuce.core.RedisURI
@@ -36,7 +38,10 @@ class RedisLettuceLokkProvider(
         const val KEY_PREFIX: String = "lokk:"
 
         // fixme remove
-        private val OBJECT_MAPPER = jacksonObjectMapper()
+        private val OBJECT_MAPPER = ObjectMapper().apply {
+            registerModule(KotlinModule())
+            registerModule(JavaTimeModule())
+        }
     }
 
     override suspend fun tryLock(lokkInfo: LokkInfo): Boolean {
