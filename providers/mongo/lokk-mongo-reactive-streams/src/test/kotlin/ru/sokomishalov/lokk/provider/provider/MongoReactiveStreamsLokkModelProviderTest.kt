@@ -13,28 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.sokomishalov.lokk.provider
+package ru.sokomishalov.lokk.provider.provider
 
 import org.junit.AfterClass
 import org.junit.ClassRule
-import ru.sokomishalov.lokk.provider.tck.LokkProviderTck
+import ru.sokomishalov.lokk.provider.LokkProvider
+import ru.sokomishalov.lokk.provider.tck.LokkModelProviderTck
 
 /**
  * @author sokomishalov
  */
-class RedisLokkProviderTest : LokkProviderTck() {
+
+class MongoReactiveStreamsLokkModelProviderTest : LokkModelProviderTck() {
 
     companion object {
         @get:ClassRule
-        val redis: RedisTestContainer = createDefaultRedisContainer()
+        val mongo: MongoTestContainer = createDefaultMongoContainer()
 
         @AfterClass
         @JvmStatic
-        fun stop() = redis.stop()
+        fun stop() = mongo.stop()
     }
 
     override val lokkProvider: LokkProvider by lazy {
-        redis.start()
-        RedisLettuceLokkProvider(client = redis.createRedisClient())
+        mongo.start()
+        MongoReactiveStreamsLokkProvider(client = mongo.createReactiveMongoClient())
     }
 }

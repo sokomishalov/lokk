@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.sokomishalov.lokk.provider
+package ru.sokomishalov.lokk.provider.model
 
 import java.time.ZonedDateTime
 
@@ -21,7 +21,7 @@ import java.time.ZonedDateTime
  * @author sokomishalov
  */
 
-data class LokkInfo(
+data class LokkDTO(
         val name: String,
         val lockedBy: String,
         val lockedAt: ZonedDateTime,

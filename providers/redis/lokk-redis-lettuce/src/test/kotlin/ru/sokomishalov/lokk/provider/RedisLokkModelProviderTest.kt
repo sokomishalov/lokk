@@ -13,18 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.sokomishalov.lokk.provider.internal
+package ru.sokomishalov.lokk.provider
 
-import java.lang.System.getenv
-import java.net.InetAddress
+import org.junit.AfterClass
+import org.junit.ClassRule
+import ru.sokomishalov.lokk.provider.tck.LokkModelProviderTck
 
 /**
  * @author sokomishalov
  */
-@PublishedApi
-internal val HOSTNAME: String by lazy {
-    getenv("HOSTNAME")
-            ?: getenv("COMPUTERNAME")
-            ?: runCatching { InetAddress.getLocalHost().hostAddress }.getOrNull()
-            ?: ""
+class RedisLokkModelProviderTest : LokkModelProviderTck() {
+
+    companion object {
+        @get:ClassRule
+        val redis: RedisTestContainer = createDefaultRedisContainer()
+
+        @AfterClass
+        @JvmStatic
+        fun stop() = redis.stop()
+    }
+
+    override val lokkProvider: LokkProvider by lazy {
+        redis.start()
+        RedisLettuceLokkProvider(client = redis.createRedisClient())
+    }
 }

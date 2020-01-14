@@ -15,12 +15,16 @@
  */
 package ru.sokomishalov.lokk.provider
 
+import ru.sokomishalov.lokk.provider.model.LokkChallengerDTO
+import ru.sokomishalov.lokk.provider.model.LokkDTO
+import ru.sokomishalov.lokk.provider.model.LokkResult
+
 /**
  * @author sokomishalov
  */
 interface LokkProvider {
 
-    suspend fun tryLock(lokkInfo: LokkInfo): Boolean
+    suspend fun tryLock(lokkChallenger: LokkChallengerDTO): LokkResult<LokkDTO>
 
-    suspend fun release(lokkInfo: LokkInfo)
+    suspend fun release(lokkDTO: LokkDTO)
 }

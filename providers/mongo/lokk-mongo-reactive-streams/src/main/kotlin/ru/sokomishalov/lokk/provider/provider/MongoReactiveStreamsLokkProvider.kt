@@ -16,9 +16,6 @@
 package ru.sokomishalov.lokk.provider.provider
 
 import com.mongodb.ConnectionString
-import com.mongodb.ErrorCategory.DUPLICATE_KEY
-import com.mongodb.ErrorCategory.fromErrorCode
-import com.mongodb.MongoServerException
 import com.mongodb.client.model.Filters.*
 import com.mongodb.client.model.FindOneAndUpdateOptions
 import com.mongodb.client.model.Updates.combine
@@ -28,8 +25,10 @@ import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.bson.Document
-import ru.sokomishalov.lokk.provider.LokkInfo
 import ru.sokomishalov.lokk.provider.LokkProvider
+import ru.sokomishalov.lokk.provider.model.*
+import ru.sokomishalov.lokk.provider.nodeName
+import java.time.ZoneId
 import java.util.*
 
 /**
@@ -57,33 +56,31 @@ class MongoReactiveStreamsLokkProvider(
      * 2. The lock document exists and lockUntil before now - it is updated - we have the lock
      * 3. The lock document exists and lockUntil after now - Duplicate key exception is thrown
      */
-    override suspend fun tryLock(lokkInfo: LokkInfo): Boolean {
-        return try {
+    override suspend fun tryLock(lokkChallenger: LokkChallengerDTO): LokkResult<LokkDTO> {
+        return runCatching {
+            val lockTime = Date()
             getCollection()
                     .findOneAndUpdate(
-                            and(eq(ID_FIELD, lokkInfo.name), lte(LOCKED_UNTIL_FIELD, Date())),
+                            and(eq(ID_FIELD, lokkChallenger.name), lte(LOCKED_UNTIL_FIELD, Date())),
                             combine(
-                                    set(LOCKED_UNTIL_FIELD, Date.from(lokkInfo.lockedUntil.toInstant())),
-                                    set(LOCKED_AT_FIELD, Date.from(lokkInfo.lockedAt.toInstant())),
-                                    set(LOCKED_BY_FIELD, lokkInfo.lockedBy)
+                                    set(LOCKED_UNTIL_FIELD, Date.from(lokkChallenger.lockUntil.toInstant())),
+                                    set(LOCKED_AT_FIELD, Date()),
+                                    set(LOCKED_BY_FIELD, nodeName)
                             ),
                             FindOneAndUpdateOptions().upsert(true)
                     )
                     .awaitFirstOrNull()
-            true
-        } catch (e: MongoServerException) {
-            when (fromErrorCode(e.code)) {
-                DUPLICATE_KEY -> false
-                else -> throw e
-            }
+            lokkChallenger.success(lockedAt = lockTime.toInstant().atZone(ZoneId.systemDefault()))
+        }.getOrElse {
+            lokkChallenger.failure(exception = it)
         }
     }
 
-    override suspend fun release(lokkInfo: LokkInfo) {
+    override suspend fun release(lokkDTO: LokkDTO) {
         getCollection()
                 .findOneAndUpdate(
-                        eq(ID_FIELD, lokkInfo.name),
-                        combine(set(LOCKED_UNTIL_FIELD, Date.from(lokkInfo.lockedUntil.toInstant())))
+                        eq(ID_FIELD, lokkDTO.name),
+                        combine(set(LOCKED_UNTIL_FIELD, Date.from(lokkDTO.lockedUntil.toInstant())))
                 )
                 .awaitFirstOrNull()
     }

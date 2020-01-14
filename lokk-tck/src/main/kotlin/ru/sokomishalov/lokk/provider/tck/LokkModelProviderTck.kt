@@ -21,6 +21,9 @@ package ru.sokomishalov.lokk.provider.tck
  * @author sokomishalov
  */
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -32,7 +35,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * @author sokomishalov
  */
-abstract class LokkProviderTck {
+abstract class LokkModelProviderTck {
 
     protected abstract val lokkProvider: LokkProvider
 
@@ -66,5 +69,31 @@ abstract class LokkProviderTck {
         }
 
         assertEquals(iterations, counter.get())
+    }
+
+    @Test
+    fun `Lock while async operations`() {
+        val first = AtomicInteger(0)
+        val second = AtomicInteger(0)
+
+        runBlocking {
+            listOf(
+                    async {
+                        delay(50)
+                        lokkProvider.withLokk(atMostFor = ofMinutes(1)) {
+                            first.incrementAndGet()
+                        }
+                    },
+                    async {
+                        lokkProvider.withLokk(atMostFor = ofMinutes(1)) {
+                            delay(50)
+                            second.incrementAndGet()
+                        }
+                    }
+            ).awaitAll()
+        }
+
+        assertEquals(0, first.get())
+        assertEquals(1, second.get())
     }
 }

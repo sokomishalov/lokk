@@ -15,7 +15,10 @@
  */
 package ru.sokomishalov.lokk.provider
 
-import ru.sokomishalov.lokk.provider.internal.HOSTNAME
+import ru.sokomishalov.lokk.provider.model.LokkChallengerDTO
+import ru.sokomishalov.lokk.provider.model.LokkFailure
+import ru.sokomishalov.lokk.provider.model.LokkSuccess
+import java.net.InetAddress
 import java.time.Duration
 import java.time.Duration.ZERO
 import java.time.ZonedDateTime.now
@@ -42,30 +45,31 @@ suspend inline fun <reified T> LokkProvider.withLokk(
     require(atLeastFor <= atMostFor) { "Invalid lock durations" }
 
     val now = now()
-
     val lockedAtLeastUntil = now + atLeastFor
     val lockedAtMostUntil = now + atMostFor
 
-    val lockInfo = LokkInfo(
+    val lokkResult = tryLock(LokkChallengerDTO(
             name = name,
-            lockedBy = HOSTNAME,
-            lockedAt = now,
-            lockedUntil = lockedAtMostUntil
-    )
+            node = nodeName,
+            lockUntil = lockedAtMostUntil
+    ))
 
-    val lockResult = tryLock(lockInfo)
-
-    return when {
-        lockResult -> try {
+    return when (lokkResult) {
+        is LokkSuccess -> try {
             action()
         } finally {
-            val lockedUntilWhenReleasing = when {
+            release(lokkResult.lokkDTO.copy(lockedUntil = when {
                 lockedAtLeastUntil.isAfter(now()) -> lockedAtLeastUntil
                 else -> now()
-            }
-            val releaseInfo = lockInfo.copy(lockedUntil = lockedUntilWhenReleasing)
-            release(releaseInfo)
+            }))
         }
-        else -> ifLocked()
+        is LokkFailure -> ifLocked()
     }
+}
+
+val LokkProvider.nodeName: String by lazy {
+    System.getenv("HOSTNAME")
+            ?: System.getenv("COMPUTERNAME")
+            ?: runCatching { InetAddress.getLocalHost().hostAddress }.getOrNull()
+            ?: ""
 }

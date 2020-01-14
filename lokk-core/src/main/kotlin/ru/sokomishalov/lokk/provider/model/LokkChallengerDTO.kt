@@ -13,30 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.sokomishalov.lokk.provider.provider
+package ru.sokomishalov.lokk.provider.model
 
-import org.junit.AfterClass
-import org.junit.ClassRule
-import ru.sokomishalov.lokk.provider.LokkProvider
-import ru.sokomishalov.lokk.provider.tck.LokkProviderTck
+import java.time.ZonedDateTime
 
 /**
  * @author sokomishalov
  */
 
-class MongoReactiveStreamsLokkProviderTest : LokkProviderTck() {
-
-    companion object {
-        @get:ClassRule
-        val mongo: MongoTestContainer = createDefaultMongoContainer()
-
-        @AfterClass
-        @JvmStatic
-        fun stop() = mongo.stop()
-    }
-
-    override val lokkProvider: LokkProvider by lazy {
-        mongo.start()
-        MongoReactiveStreamsLokkProvider(client = mongo.createReactiveMongoClient())
-    }
-}
+data class LokkChallengerDTO(
+        val name: String,
+        val node: String,
+        val lockUntil: ZonedDateTime
+)
