@@ -45,41 +45,35 @@ class RedisLettuceLokkProvider(
     }
 
     override suspend fun tryLock(lokkInfo: LokkInfo): Boolean {
-        val keyValue = lokkInfo.buildKeyValue()
         val expireAfterMs = Duration.between(now(), lokkInfo.lockedUntil).toMillis()
 
         val lockAcquired = connection
                 .reactive()
-                .set(keyValue.first, keyValue.second, SetArgs().nx().px(expireAfterMs))
+                .set(lokkInfo.redisKey, lokkInfo.redisValue, SetArgs().nx().px(expireAfterMs))
                 .awaitFirstOrNull()
 
         return when {
             lockAcquired.isNullOrBlank().not() -> true
             else -> {
-                val value = connection.reactive().get(keyValue.first).awaitFirstOrNull()
+                val value = connection.reactive().get(lokkInfo.redisKey).awaitFirstOrNull()
                 value?.deserializeValue()?.lockedUntil?.isBefore(now()) ?: true
             }
         }
     }
 
     override suspend fun release(lokkInfo: LokkInfo) {
-        val keyValue = lokkInfo.buildKeyValue()
         connection
                 .reactive()
-                .set(keyValue.first, keyValue.second, SetArgs().xx())
+                .set(lokkInfo.redisKey, lokkInfo.redisValue, SetArgs().xx())
                 .awaitFirstOrNull()
     }
 
 
-    private fun LokkInfo.buildKeyValue(): Pair<String, String> {
-        val key = when {
-            KEY_PREFIX.isBlank() -> name
-            else -> "$KEY_PREFIX$name"
-        }
-        val value = OBJECT_MAPPER.writeValueAsString(this)
+    private val LokkInfo.redisKey: String
+        get() = "$KEY_PREFIX$name"
 
-        return key to value
-    }
+    private val LokkInfo.redisValue: String
+        get() = OBJECT_MAPPER.writeValueAsString(this)
 
     private fun String.deserializeValue(): LokkInfo {
         return OBJECT_MAPPER.readValue(this)
