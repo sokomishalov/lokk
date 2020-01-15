@@ -10,6 +10,6 @@ data class LokkSuccess(
 ) : LokkResult<LokkDTO>()
 
 data class LokkFailure(
-        val exception: Throwable? = null,
-        val reason: String? = exception?.message
+        val throwable: Throwable? = null,
+        val reason: String? = throwable?.message
 ) : LokkResult<LokkDTO>()
