@@ -72,7 +72,7 @@ class MongoReactiveStreamsLokkProvider(
                     .awaitFirstOrNull()
             lokkChallenger.success(lockedAt = lockTime.toInstant().atZone(ZoneId.systemDefault()))
         }.getOrElse {
-            lokkChallenger.failure(exception = it)
+            lokkChallenger.failure(throwable = it)
         }
     }
 
