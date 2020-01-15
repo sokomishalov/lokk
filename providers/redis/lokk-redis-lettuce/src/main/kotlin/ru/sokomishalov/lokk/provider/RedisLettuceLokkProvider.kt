@@ -82,7 +82,7 @@ class RedisLettuceLokkProvider(
     private val LokkChallengerDTO.redisKey: String get() = "${KEY_PREFIX}${DELIMITER}${name}"
     private val LokkDTO.redisKey: String get() = "${KEY_PREFIX}${DELIMITER}${name}"
 
-    private fun LokkChallengerDTO.serializeValue(lockedAt: ZonedDateTime = now()): String = "${node}${DELIMITER}${lockedAt.toEpochSecond()}${DELIMITER}${lockUntil.toEpochSecond()}"
+    private fun LokkChallengerDTO.serializeValue(lockedAt: ZonedDateTime = now()): String = "${lockBy}${DELIMITER}${lockedAt.toEpochSecond()}${DELIMITER}${lockUntil.toEpochSecond()}"
     private fun LokkDTO.serializeValue(): String = "${lockedBy}${DELIMITER}${lockedAt.toEpochSecond()}${DELIMITER}${lockedUntil.toEpochSecond()}"
 
     private fun String.deserializeValue(name: String): LokkDTO {

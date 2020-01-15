@@ -23,6 +23,6 @@ import java.time.ZonedDateTime
 
 data class LokkChallengerDTO(
         val name: String,
-        val node: String,
+        val lockBy: String,
         val lockUntil: ZonedDateTime
 )

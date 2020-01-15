@@ -42,16 +42,16 @@ suspend inline fun <reified T> LokkProvider.withLokk(
         action: () -> T
 ): T? {
     require(name.isNotBlank()) { "Lock name must be not empty" }
-    require(atLeastFor <= atMostFor) { "Invalid lock durations" }
+    require(atMostFor >= atLeastFor) { "Invalid lock durations" }
 
     val now = now()
-    val lockedAtLeastUntil = now + atLeastFor
-    val lockedAtMostUntil = now + atMostFor
+    val lockAtLeastUntil = now + atLeastFor
+    val lockAtMostUntil = now + atMostFor
 
     val lokkResult = tryLock(LokkChallengerDTO(
             name = name,
-            node = nodeName,
-            lockUntil = lockedAtMostUntil
+            lockBy = nodeName,
+            lockUntil = lockAtMostUntil
     ))
 
     return when (lokkResult) {
@@ -59,7 +59,7 @@ suspend inline fun <reified T> LokkProvider.withLokk(
             action()
         } finally {
             release(lokkResult.lokkDTO.copy(lockedUntil = when {
-                lockedAtLeastUntil.isAfter(now()) -> lockedAtLeastUntil
+                lockAtLeastUntil.isAfter(now()) -> lockAtLeastUntil
                 else -> now()
             }))
         }
