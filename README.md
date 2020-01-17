@@ -52,7 +52,7 @@ Import a dep:
 ```xml
 <dependency>
     <groupId>com.github.sokomishalov</groupId>
-    <artifactId>lokk-redis-lettuce</artifactId>
+    <artifactId>lokk-mongo-reactive-streams</artifactId>
     <version>${lokk.version}</version>
 </dependency>
 ```
