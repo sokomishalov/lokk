@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.sokomishalov.lokk.provider.provider
+package ru.sokomishalov.lokk.provider
 
 import com.mongodb.ConnectionString
 import com.mongodb.reactivestreams.client.MongoClient

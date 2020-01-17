@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ru.sokomishalov.lokk.provider.provider
+package ru.sokomishalov.lokk.provider
 
 import com.mongodb.ConnectionString
 import com.mongodb.client.model.Filters.*
@@ -25,9 +25,7 @@ import com.mongodb.reactivestreams.client.MongoClients
 import com.mongodb.reactivestreams.client.MongoCollection
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.bson.Document
-import ru.sokomishalov.lokk.provider.LokkProvider
 import ru.sokomishalov.lokk.provider.model.*
-import ru.sokomishalov.lokk.provider.nodeName
 import java.time.ZoneId
 import java.util.*
 
@@ -64,7 +62,7 @@ class MongoReactiveStreamsLokkProvider(
                             and(eq(ID_FIELD, lokkChallenger.name), lte(LOCKED_UNTIL_FIELD, Date())),
                             combine(
                                     set(LOCKED_UNTIL_FIELD, Date.from(lokkChallenger.lockUntil.toInstant())),
-                                    set(LOCKED_AT_FIELD, Date()),
+                                    set(LOCKED_AT_FIELD, lockTime),
                                     set(LOCKED_BY_FIELD, nodeName)
                             ),
                             FindOneAndUpdateOptions().upsert(true)
