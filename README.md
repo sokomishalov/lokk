@@ -8,6 +8,17 @@ Lokk
 ## Overview
 Kotlin/JVM coroutine-based distributed locks
 
+## Why not [ShedLock](https://github.com/lukas-krecan/ShedLock)?
+
+There are some simple advantages:
+- Core API is build on coroutines (suspend-able methods), providers are implementing them with **non-blocking** APIs
+- There are no optional hell inside core, result is an instance of sealed class
+- Kotlin DSL api
+
+Disadvantages:
+- Much less implementations are done :( (plz help and contribute!)
+
+
 ## Distribution
 Library with modules are available only from `jitpack` so far:
 ```xml
