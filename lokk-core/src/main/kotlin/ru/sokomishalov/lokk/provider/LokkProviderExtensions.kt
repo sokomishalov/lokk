@@ -68,8 +68,8 @@ suspend inline fun <reified T> LokkProvider.withLokk(
 }
 
 val LokkProvider.nodeName: String by lazy {
-    System.getenv("HOSTNAME")
-            ?: System.getenv("COMPUTERNAME")
+    System.getenv("HOSTNAME").ifBlank { null }
+            ?: System.getenv("COMPUTERNAME").ifBlank { null }
             ?: runCatching { InetAddress.getLocalHost().hostAddress }.getOrNull()
-            ?: ""
+            ?: "localhost"
 }
