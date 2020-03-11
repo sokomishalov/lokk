@@ -12,10 +12,10 @@
     <properties>
         <java.version>1.8</java.version>
         <kotlin.version>1.3.70</kotlin.version>
-        <kotlinx.version>1.3.3</kotlinx.version>
-        <jackson.version>2.10.1</jackson.version>
+        <kotlinx-coroutines.version>1.3.4</kotlinx-coroutines.version>
+        <jackson.version>2.10.3</jackson.version>
         <logback.version>1.2.3</logback.version>
-        <spring.version>5.2.2.RELEASE</spring.version>
+        <spring.version>5.2.4.RELEASE</spring.version>
         <lettuce.version>5.2.2.RELEASE</lettuce.version>
         <mongo-reactive.version>4.0.0</mongo-reactive.version>
         <test-containers.version>1.13.0</test-containers.version>
@@ -53,12 +53,9 @@
                     <version>3.0</version>
                     <configuration>
                         <header>header.txt</header>
-                        <excludes>
-                            <exclude>LICENSE.md</exclude>
-                            <exclude>*.xml</exclude>
-                            <exclude>*.properties</exclude>
-                            <exclude>*.yml</exclude>
-                        </excludes>
+                        <includes>
+                            <include>**/*.kt</include>
+                        </includes>
                     </configuration>
                 </plugin>
             </plugins>
