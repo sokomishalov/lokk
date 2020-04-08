@@ -17,7 +17,7 @@
         <logback.version>1.2.3</logback.version>
         <spring.version>5.2.4.RELEASE</spring.version>
         <lettuce.version>5.2.2.RELEASE</lettuce.version>
-        <mongo-reactive.version>4.0.1</mongo-reactive.version>
+        <mongo-reactive.version>4.0.2</mongo-reactive.version>
         <test-containers.version>1.13.0</test-containers.version>
     </properties>
 
